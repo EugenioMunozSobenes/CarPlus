@@ -1,0 +1,84 @@
+
+/**
+ * APUNTES varios
+ */
+ 
+ // README
+#define _LED_ALERT 2
+#define _INTERVAL_BLINK_ALERT 200
+
+/*
+===================================
+Activa una vista del display
+===================================
+*/
+void grafica_MainMenu()
+{
+  u8g2.setContrast(128);
+  u8g2.setFontMode(1); // Transparent
+  u8g2.setFont(u8g2_font_6x10_tf);
+  displayCenterText(lcd.xPos50, 10, "Menu");
+  // int wText = u8g2.getStrWidth(text.c_str());
+
+  u8g2.drawBox(0, option * lcd.yPos100 / 5, lcd.xPos100, 11);
+
+  u8g2.drawStr(0, lcd.yPos100 / 5 + 10, "Inclination");
+  u8g2.drawStr(0, 2 * lcd.yPos100 / 5 + 10, "Set clock");
+  u8g2.drawStr(0, 3 * lcd.yPos100 / 5 + 10, "Alerts");
+}
+
+/*
+===================================
+Comenta lo que hay en la pantalla
+===================================
+*/
+String zeroFillAbs(int num)
+{
+  String buffer = String(abs(num));
+  if (num < 10)
+    buffer = "0" + buffer;
+  Serial.println(buffer);
+  return buffer;
+}
+/*
+======================================
+Verifica si hay que avisar un alerta
+======================================
+*/
+void checkAlerts()
+{
+  boolean alerting = false;
+  // ROLL
+  if (alert.Roll < abs(inclination.ang_x))
+  {
+    alerting = true;
+    lcd.activeScreen = 0;
+    talk(classVoice::Roll);
+  }
+  // PITCH
+  else if (alert.Pitch < abs(inclination.ang_y))
+  {
+    alerting = true;
+    lcd.activeScreen = 0;
+    talk(classVoice::Pitch);
+  }
+  // TEMPERATURE
+  else if (abs(_previousTemperature - _actualTemperature) > 2)
+  {
+    alerting = true;
+    lcd.activeScreen = 2;
+    _previousTemperature = _actualTemperature;
+    talk(classVoice::temperature);
+  }
+  // NADA
+  else
+  {
+    digitalWrite(2, 0);
+  }
+
+  if (alerting && (millis() - alert.lastTime) > _INTERVAL_BLINK_ALERT)
+  {
+    digitalWrite(2, !digitalRead(2));
+    alert.lastTime = millis();
+  }
+}
