@@ -1,3 +1,12 @@
+/**
+ * @file CorDS3231.h
+ * @brief Displays real time weather information.
+ *          in the electronic design implements the DS3231 CLOCK module.
+ * @version 1.0
+ * @author ICI/INF Eugenio Muñoz Sobenes
+ * @Contact: eugeniomunozsobenes@gmail.com
+ * @date 2024-03-01
+ */
 #ifndef _CorDS3231_H_
 #define _CorDS3231_H_
 

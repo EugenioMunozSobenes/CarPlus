@@ -3,7 +3,7 @@
  * @brief Encapsulation for OLED display handling
  * @version 1.0
  * @author ICI/INF Eugenio Muñoz Sobenes
- * Contact: cormansky@gmail.com
+ * @Contact: eugeniomunozsobenes@gmail.com
  * @date 2024-03-01
  */
 #include "CorU8G2.h"

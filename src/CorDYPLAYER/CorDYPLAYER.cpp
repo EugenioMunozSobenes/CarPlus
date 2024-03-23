@@ -4,7 +4,7 @@
  *          in the electronic design implements the DYPLAYER module.
  * @version 1.0
  * @author ICI/INF Eugenio Muñoz Sobenes
- * Contact: cormansky@gmail.com
+ * @Contact: eugeniomunozsobenes@gmail.com
  * @date 2024-03-01
  */
 #include "CorDYPLAYER/CorDYPLAYER.h"
