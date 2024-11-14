@@ -1,3 +1,5 @@
 README.md
 
-Descripción: Sistema de seguridad de inclinación Roll-Pitch de para vehículos todo terreno. Además, de entregar las condiciones ambientales del momento.
+Description: Roll-Pitch tilt safety system for off-road vehicles. In addition, to deliver the environmental conditions of the moment.
+
+Status: In development
