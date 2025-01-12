@@ -31,7 +31,7 @@
 #define _DEBOUNCE_TIME 50      // set debounce time to 50 milliseconds
 #define _NUMBER_THE_OPTIONS 4
 
-uint8_t activeOption = 3;
+uint8_t activeOption = 1;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
@@ -96,12 +96,12 @@ void sayReport()
    switch (activeOption)
    {
    case 1:
-      _Metoro.readAndShow();
-      _player.sayTheTemperature(_Metoro.data.temperature);
-      break;
-   case 2:
       _Clock.readAndShow();
       _player.sayTheCurrentTime(_Clock.data.hour(), _Clock.data.minute());
+      break;
+   case 2:
+      _Metoro.readAndShow();
+      _player.sayTheTemperature(_Metoro.data.temperature);     
       break;
    case 3:
       _Inclinometro.readAndShowCarForm();
