@@ -19,7 +19,7 @@ CorDYPLAYER::CorDYPLAYER(void)
 {
 }
 void CorDYPLAYER::begin(void)
-{
+{ return;
     player = DY::Player(&HwSerial);
     player.begin();
     player.setVolume(30); // 100% Volume
@@ -28,10 +28,10 @@ void CorDYPLAYER::sayWelcome(void)
 {
 }
 void CorDYPLAYER::sayTheRollInclination(float angle)
-{
+{ return;
     int i = 0;
     char buf[6];
-
+   
     voicesBuffer[i++] = _VOICE_ROLL_INCLINATOR; // Inclinación roll
     dtostrf(abs(angle), 2, 0, buf);
     voicesBuffer[i++] = buf;
@@ -39,7 +39,7 @@ void CorDYPLAYER::sayTheRollInclination(float angle)
     sendToDYPLAYER(i);
 }
 void CorDYPLAYER::sayThePitchInclination(float angle)
-{
+{ return;
     int i = 0;
     char buf[6];
     voicesBuffer[i++] = _VOICE_PITCH_INCLINATOR; // Inclinación pitch
@@ -49,7 +49,7 @@ void CorDYPLAYER::sayThePitchInclination(float angle)
     sendToDYPLAYER(i);
 }
 void CorDYPLAYER::sayTheCurrentTime(uint8_t hour, uint8_t minute)
-{
+{ return;
     int i = 0;
     char buf[6];
     dtostrf(hour, 2, 0, buf);
@@ -61,7 +61,7 @@ void CorDYPLAYER::sayTheCurrentTime(uint8_t hour, uint8_t minute)
     sendToDYPLAYER(i);
 }
 void CorDYPLAYER::sayTheTemperature(float temperature)
-{
+{ return;
     int i = 0;
     char buf[6];
     voicesBuffer[i++] = _VOICE_TEMPERATURE; // temperature
@@ -77,7 +77,7 @@ void CorDYPLAYER::sayThePressure(float pressure)
 {
 }
 void CorDYPLAYER::sendToDYPLAYER(int numberOfWords)
-{
+{ return;
     int size = 8;
     char *sounds[size];
     //std::unique_ptr<char[]> sounds(new char[size]);

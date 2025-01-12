@@ -2,7 +2,8 @@
     "cmake.configureOnOpen": false,
     "files.associations": {
         "readme": "c",
-        "adafruit_sensor.h": "c"
+        "adafruit_sensor.h": "c",
+        "string": "cpp"
     },
     "idf.portWin": "COM3"
 }

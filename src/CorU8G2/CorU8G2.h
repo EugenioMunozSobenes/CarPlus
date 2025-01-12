@@ -19,8 +19,8 @@
 #include <Wire.h>
 #endif
 
-#define _SDA 15 /* GPIO15 */
-#define _SCL 4  /* GPIO04 */
+#define _SDA 32 /* GPIO15 */
+#define _SCL 35 /* GPIO04 */
 
 typedef struct
 {

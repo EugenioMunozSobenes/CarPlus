@@ -18,9 +18,9 @@
 #include "CorMeteorology/CorMeteorology.h"
 #include "CorDYPLAYER/CorDYPLAYER.h"
 #include "CorMenu/CorMenu.h"
-#define _SDA 15    /* GPIO15 */
-#define _SCL 4     /* GPIO04 */
-#define _RED_LED 2 /* GPIO02 */
+#define _SDA 15    /* D15 */
+#define _SCL 4     /* D4 */
+#define _RED_LED 2 /* D2 */
 
 /*==============================================*/
 /* defines buttons and assigns them to the GPIO */
@@ -31,19 +31,21 @@
 #define _DEBOUNCE_TIME 50      // set debounce time to 50 milliseconds
 #define _NUMBER_THE_OPTIONS 4
 
-uint8_t activeOption = 1;
+uint8_t activeOption = 3;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
-ezButton buttonMenuSpeech(12);    /* GPIO12 */
-ezButton buttonMenuPlus(13);      /* GPIO13 */
-ezButton buttonMenuMinus(32);     /* GPIO32 */
-ezButton buttonMenuConfigure(33); /* GPIO33 */
+
+ezButton buttonMenuPlus(13);      /* D13 */
+ezButton buttonMenuMinus(32);     /* D32 */
+//ezButton buttonMenuSpeech(12);    /* D12 */
+ezButton buttonMenuConfigure(33); /* D33 */
 
 /*================*/
 /* define sensors */
 /*================*/
-U8G2_ST7565_NHD_C12864_F_4W_SW_SPI u8g2(U8G2_R0, /* scl=*/18, /* si=*/23, /* cs=*/5, /* rs=*/21, /* rse=*/19);
+
+U8G2_ST7565_NHD_C12864_F_4W_SW_SPI u8g2(U8G2_R0, /* scl=D18*/18, /* si=D23*/23, /* cs=D5*/5, /* rs=D21*/21, /* rse=D19*/19);
 
 CorU8G2 _Pantalla(&u8g2);
 CorMPU6050 _Inclinometro(&_Pantalla);
@@ -71,7 +73,7 @@ void setup(void)
    _Inclinometro.begin();
    _Clock.begin();
    _Metoro.begin();
-   _player.begin();
+   //_player.begin();
 
    pinMode(_RED_LED, OUTPUT);
    digitalWrite(_RED_LED, 0);
@@ -82,7 +84,7 @@ void setup(void)
 
    buttonMenuMinus.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuPlus.setDebounceTime(_DEBOUNCE_TIME);
-   buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
+  // buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuConfigure.setDebounceTime(_DEBOUNCE_TIME);
 }
 
@@ -142,10 +144,10 @@ void buttonRutine(ezButton &button)
          {
             activeOption += (activeOption >= _NUMBER_THE_OPTIONS) ? 0 : 1;
          }
-         else if (&button == &buttonMenuSpeech)
+         /*else if (&button == &buttonMenuSpeech)
          {
-            sayReport();
-         }
+            //sayReport();
+         }*/
       }
       if (pressDuration > _LONG_PRESS_TIME)
       {
@@ -160,7 +162,7 @@ void loop(void)
    /*=========================*/
    buttonRutine(buttonMenuMinus);
    buttonRutine(buttonMenuPlus);
-   buttonRutine(buttonMenuSpeech);
+   //buttonRutine(buttonMenuSpeech);
    buttonRutine(buttonMenuConfigure);
 
    /*===============================*/
@@ -171,10 +173,10 @@ void loop(void)
       switch (activeOption)
       {
       case 1:
-         _Metoro.readAndShow();
+         _Clock.readAndShow();
          break;
       case 2:
-         _Clock.readAndShow();
+         _Metoro.readAndShow();
          break;
       case 3:
          _Inclinometro.readAndShowCarForm();
