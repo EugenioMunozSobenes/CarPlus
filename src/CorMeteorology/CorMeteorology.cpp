@@ -32,7 +32,7 @@ void CorMeteorology::begin(void)
 void CorMeteorology::readAndShow(void)
 {
     read();
-    //if (previousData.altitude != data.altitude || previousData.humidity != data.humidity || previousData.pressure != data.pressure || previousData.temperature != data.temperature)
+    // if (previousData.altitude != data.altitude || previousData.humidity != data.humidity || previousData.pressure != data.pressure || previousData.temperature != data.temperature)
     {
         show();
         previousData.altitude = data.altitude;
@@ -46,22 +46,24 @@ void CorMeteorology::read(void)
     switch (th.Read())
     {
     case 2:
-       data.altitude = data.humidity = data.pressure = data.temperature =-2;
+        data.humidity = -2;
+        data.temperature = th.cTemp;
         Serial.println(F(" CRC failed"));
         break;
     case 1:
-        data.altitude = data.humidity = data.pressure = data.temperature =-1;
+        data.humidity = -1;
+        data.temperature = th.cTemp;
         Serial.println(F(" Sensor offline"));
         break;
     case 0:
-    
+
         // GOOD!!!
-        data.altitude = bmp.readAltitude(1021);
         data.humidity = th.Humidity;
-        data.pressure = bmp.readPressure();
         data.temperature = th.cTemp;
-       break;
+        break;
     }
+    data.altitude = bmp.readAltitude(1021);
+    data.pressure = bmp.readPressure();
 }
 void CorMeteorology::dataSetZero(void)
 {

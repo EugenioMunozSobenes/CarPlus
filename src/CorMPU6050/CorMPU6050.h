@@ -16,7 +16,7 @@
 
 #include "CorU8G2/CorU8G2.h"
 
-#define _MPU6050_I2C_ADDRESS 0x69 /* I2C 69 */
+#define _MPU6050_I2C_ADDRESS 0x68 /* I2C 69 */
 #define _RADIO_ROLL 30
 
 typedef struct
