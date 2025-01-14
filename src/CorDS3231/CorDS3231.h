@@ -13,14 +13,16 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <RTClib.h>
+#include "RTClib.h"
 
 
 #include "CorU8G2/CorU8G2.h"
 
+
 class CorDS3231
 {
 private:
+  
   RTC_DS3231 rtc;
   DateTime _lastNow;
   float _actualTemperature;
@@ -28,10 +30,11 @@ private:
   float _humedity = 0;
 
 public:
+  
   CorU8G2 oled;
   CorDS3231(CorU8G2 *pantalla);
   DateTime data;
-  void begin(void);
+  bool begin(TwoWire *wireInstance);
   void welcome(void);
   void readAndShow(void);
   void showClock(void);

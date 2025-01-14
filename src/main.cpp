@@ -31,7 +31,7 @@
 #define _DEBOUNCE_TIME 50      // set debounce time to 50 milliseconds
 #define _NUMBER_THE_OPTIONS 4
 
-uint8_t activeOption = 3;
+uint8_t activeOption = 1;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
@@ -55,7 +55,7 @@ CorDYPLAYER _player;
 CorMenu _Menu(&u8g2);
 unsigned long _SENSOR_SCAN_DELAY = 300;
 unsigned long _LAST_TIME_MILLIS = 0;
-
+TwoWire I2CBME = TwoWire(1);
 /*================*/
 /*    setup       */
 /*================*/
@@ -66,12 +66,13 @@ void setup(void)
 
    Serial.begin(115200);
    Wire.begin(_SDA, _SCL); //(SDA,SCL)
+   I2CBME.begin(26, 27, 400000);
 
    /*===========================*/
    /* initiates sensor services */
    /*===========================*/
    _Inclinometro.begin();
-   _Clock.begin();
+   _Clock.begin(&I2CBME);
    _Metoro.begin();
    //_player.begin();
 
