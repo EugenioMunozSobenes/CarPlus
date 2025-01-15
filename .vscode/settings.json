@@ -3,7 +3,8 @@
     "files.associations": {
         "readme": "c",
         "adafruit_sensor.h": "c",
-        "string": "cpp"
+        "string": "cpp",
+        "cmath": "cpp"
     },
     "idf.portWin": "COM3"
 }

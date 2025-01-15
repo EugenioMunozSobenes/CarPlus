@@ -39,8 +39,8 @@ void CorMPU6050::read()
   float ay = a.acceleration.y;
   float az = a.acceleration.z;
   // Calculate angles with accelerometer
-  mpuData.accel_ang_x = atan(ay / sqrt(ax * ax + az * az)) * (180.0 / M_PI);
-  mpuData.accel_ang_y = atan(-ax / sqrt(ay * ay + az * az)) * (180.0 / M_PI);
+  mpuData.accel_ang_x = -atan(ay / sqrt(ax * ax + az * az)) * (180.0 / M_PI);
+  mpuData.accel_ang_y = -atan(-ax / sqrt(ay * ay + az * az)) * (180.0 / M_PI);
   // Calculate angle of rotation with gyroscope and complementary filter
   mpuData.ang_x = 0.80 * (mpuData.ang_x_prev + (g.gyro.x / 131) * mpuData.dt) + 0.20 * mpuData.accel_ang_x;
   mpuData.ang_y = 0.80 * (mpuData.ang_y_prev + (g.gyro.y / 131) * mpuData.dt) + 0.20 * mpuData.accel_ang_y;
@@ -69,8 +69,8 @@ void CorMPU6050::showFlightForm(void)
 
   // DATA
   float longHorizont = _RADIO_ROLL + 2;
-  float xx = longHorizont * cos(-mpuData.ang_x * M_PI / 180.0);
-  float xy = longHorizont * sin(-mpuData.ang_x * M_PI / 180.0);
+  float xx = longHorizont * cos((-mpuData.ang_x) * M_PI / 180.0);
+  float xy = longHorizont * sin((-mpuData.ang_x) * M_PI / 180.0);
   float h = _RADIO_ROLL * sin(mpuData.ang_y * M_PI / 180.0);
   int X1 = oled.lcdData.xPos100 - _RADIO_ROLL - 4 - xx;
   int Y1 = oled.lcdData.yPos50 + xy + h;
@@ -80,8 +80,8 @@ void CorMPU6050::showFlightForm(void)
   oled.u8g2.drawLine(X1, Y1, X2, Y2);
   oled.u8g2.drawLine(X1, Y1 + 1, X2, Y2 + 1);
   oled.u8g2.setFont(u8g2_font_10x20_me);
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos50 - 6, String(mpuData.ang_y, 0).c_str());
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos100 - 6, String(-mpuData.ang_x, 0).c_str());
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos50 - 6, String(mpuData.ang_y +mpuData.offset_y,0).c_str());
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos100 - 6, String(-mpuData.ang_x+mpuData.offset_x, 0).c_str());
   oled.u8g2.sendBuffer();
 }
 void CorMPU6050::showCarForm(void)
@@ -105,8 +105,8 @@ void CorMPU6050::showCarForm(void)
 
   // Show data
   oled.u8g2.setFont(u8g2_font_logisoso24_tf);
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos75, String(abs(mpuData.ang_x), 0)); // Roll
-  oled.displayCenterText(oled.lcdData.xPos75, oled.lcdData.yPos75, String(abs(mpuData.ang_y), 0)); // Pitch
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos75, String(abs(mpuData.ang_x)+mpuData.offset_x, 0)); // Roll
+  oled.displayCenterText(oled.lcdData.xPos75, oled.lcdData.yPos75, String(abs(mpuData.ang_y)+mpuData.offset_y, 0)); // Pitch
 
   float x = 30 * cos(M_PI / 2 + mpuData.ang_x * M_PI / 180.0);
   float y = -30 * sin(M_PI / 2 + mpuData.ang_x * M_PI / 180.0);
@@ -130,4 +130,10 @@ void CorMPU6050::setAlerts(int roll, int pitch)
 {
   alertRoll = roll;
   alertPitch = pitch;
+}
+void CorMPU6050::setZero()
+{
+  mpuData.offset_y=-mpuData.ang_y;
+  mpuData.offset_x=mpuData.ang_x;
+  
 }

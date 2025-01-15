@@ -31,15 +31,16 @@
 #define _DEBOUNCE_TIME 50      // set debounce time to 50 milliseconds
 #define _NUMBER_THE_OPTIONS 4
 
-uint8_t activeOption = 1;
+uint8_t activeFunction = 1;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
 
-ezButton buttonMenuPlus(13);      /* D13 */
-ezButton buttonMenuMinus(32);     /* D32 */
-//ezButton buttonMenuSpeech(12);    /* D12 */
-ezButton buttonMenuConfigure(33); /* D33 */
+ezButton buttonMenuMinus(13);     /* D13 1000*/
+ezButton buttonMenuPlus(32);      /* D32 0001*/
+
+//ezButton buttonMenuSpeech(33);    /* D33 0010*/
+ezButton buttonMenuConfigure(12); /* D12 0100*/
 
 /*================*/
 /* define sensors */
@@ -55,7 +56,7 @@ CorDYPLAYER _player;
 CorMenu _Menu(&u8g2);
 unsigned long _SENSOR_SCAN_DELAY = 300;
 unsigned long _LAST_TIME_MILLIS = 0;
-TwoWire I2CBME = TwoWire(1);
+TwoWire WireI2C_B = TwoWire(1);
 /*================*/
 /*    setup       */
 /*================*/
@@ -66,13 +67,13 @@ void setup(void)
 
    Serial.begin(115200);
    Wire.begin(_SDA, _SCL); //(SDA,SCL)
-   I2CBME.begin(26, 27, 400000);
+   WireI2C_B.begin(26, 27, 400000); //(SDA=D26,SCL=D27)
 
    /*===========================*/
    /* initiates sensor services */
    /*===========================*/
    _Inclinometro.begin();
-   _Clock.begin(&I2CBME);
+   _Clock.begin(&WireI2C_B);
    _Metoro.begin();
    //_player.begin();
 
@@ -94,7 +95,7 @@ void setup(void)
 /*=====================*/
 void sayReport()
 {
-   switch (activeOption)
+   switch (activeFunction)
    {
    case 1:
       _Clock.readAndShow();
@@ -114,7 +115,7 @@ void sayReport()
       _player.sayTheRollInclination(_Inclinometro.mpuData.ang_x);
       _player.sayThePitchInclination(_Inclinometro.mpuData.ang_y);
    }
-   // Serial.println(activeOption);
+   // Serial.println(activeFunction);
 }
 /*===========================*/
 /* button event rutine       */
@@ -132,18 +133,13 @@ void buttonRutine(ezButton &button)
 
       if (pressDuration < _SHORT_PRESS_TIME)
       {
-         if (&button == &buttonMenuConfigure)
+          if (&button == &buttonMenuMinus && activeFunction>1)
          {
-            activeOption = 5;
-            _Menu.show();
+            activeFunction--;
          }
-         else if (&button == &buttonMenuMinus)
+         else if (&button == &buttonMenuPlus && activeFunction < _NUMBER_THE_OPTIONS)
          {
-            activeOption -= (activeOption <= 1) ? 0 : 1;
-         }
-         else if (&button == &buttonMenuPlus)
-         {
-            activeOption += (activeOption >= _NUMBER_THE_OPTIONS) ? 0 : 1;
+            activeFunction++;
          }
          /*else if (&button == &buttonMenuSpeech)
          {
@@ -152,6 +148,12 @@ void buttonRutine(ezButton &button)
       }
       if (pressDuration > _LONG_PRESS_TIME)
       {
+         if (&button == &buttonMenuConfigure && (activeFunction==3 || activeFunction==4))
+         {
+            _Inclinometro.setZero();
+            digitalWrite(_RED_LED, 1);
+            //_Menu.show();
+         }
       }
    }
 }
@@ -171,7 +173,7 @@ void loop(void)
    /*===============================*/
    if ((millis() - _LAST_TIME_MILLIS) > _SENSOR_SCAN_DELAY) /*Sensor reading interval, non blocking delay*/
    {
-      switch (activeOption)
+      switch (activeFunction)
       {
       case 1:
          _Clock.readAndShow();
@@ -186,7 +188,7 @@ void loop(void)
          _Inclinometro.readAndShowFlightForm();
          break;
       case 5:
-         _Menu.show();
+         //_Menu.show();
          break;
       }
 

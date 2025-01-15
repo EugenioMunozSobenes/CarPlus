@@ -29,6 +29,7 @@ typedef struct
   float dt;
   float ang_x, ang_y;
   float ang_x_prev, ang_y_prev;
+  float offset_x=0,offset_y=0;
 } mpu6050_t;
 
 // ================
@@ -47,7 +48,7 @@ public:
   void readAndShowCarForm(void);
   void readAndShowFlightForm(void);
   void setAlerts(int alertRoll, int alertPitch);
-
+  void setZero();
 private:
   Adafruit_MPU6050 mpu;
   int alertPitch = 35; // Default value
