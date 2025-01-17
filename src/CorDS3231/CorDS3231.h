@@ -30,7 +30,9 @@ private:
   float _humedity = 0;
 
 public:
-  
+  enum dateType {
+    _DAY,_MONTH,_YEAR,_HOUR,_MINUTES
+  } ;
   CorU8G2 oled;
   CorDS3231(CorU8G2 *pantalla);
   DateTime data;
@@ -38,6 +40,8 @@ public:
   void welcome(void);
   void readAndShow(void);
   void showClock(void);
+  void add(dateType attribute,uint16_t inc);
+  void adjust(int year,int month,int day,int hour,int minute);
 };
 
 #endif

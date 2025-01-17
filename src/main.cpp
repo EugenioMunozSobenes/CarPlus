@@ -74,6 +74,8 @@ void setup(void)
    /*===========================*/
    _Inclinometro.begin();
    _Clock.begin(&WireI2C_B);
+
+_Clock.adjust(2024,01,17,8,54);
    _Metoro.begin();
    //_player.begin();
 
