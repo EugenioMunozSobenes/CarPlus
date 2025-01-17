@@ -32,21 +32,21 @@
 #define _NUMBER_THE_OPTIONS 4
 
 uint8_t activeFunction = 1;
+bool activeConfig = false;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
+ezButton buttonMenuMinus(13); /* D13 1000*/
+ezButton buttonMenuPlus(32);  /* D32 0001*/
 
-ezButton buttonMenuMinus(13);     /* D13 1000*/
-ezButton buttonMenuPlus(32);      /* D32 0001*/
-
-//ezButton buttonMenuSpeech(33);    /* D33 0010*/
+ezButton buttonMenuSpeech(33);    /* D33 0010*/
 ezButton buttonMenuConfigure(12); /* D12 0100*/
 
 /*================*/
 /* define sensors */
 /*================*/
 
-U8G2_ST7565_NHD_C12864_F_4W_SW_SPI u8g2(U8G2_R0, /* scl=D18*/18, /* si=D23*/23, /* cs=D5*/5, /* rs=D21*/21, /* rse=D19*/19);
+U8G2_ST7565_NHD_C12864_F_4W_SW_SPI u8g2(U8G2_R0, /* scl=D18*/ 18, /* si=D23*/ 23, /* cs=D5*/ 5, /* rs=D21*/ 21, /* rse=D19*/ 19);
 
 CorU8G2 _Pantalla(&u8g2);
 CorMPU6050 _Inclinometro(&_Pantalla);
@@ -66,7 +66,7 @@ void setup(void)
    // Add menu page to menu and set it as current
 
    Serial.begin(115200);
-   Wire.begin(_SDA, _SCL); //(SDA,SCL)
+   Wire.begin(_SDA, _SCL);          //(SDA,SCL)
    WireI2C_B.begin(26, 27, 400000); //(SDA=D26,SCL=D27)
 
    /*===========================*/
@@ -74,8 +74,7 @@ void setup(void)
    /*===========================*/
    _Inclinometro.begin();
    _Clock.begin(&WireI2C_B);
-
-_Clock.adjust(2024,01,17,8,54);
+   //_Clock.adjust(2024,01,17,10,51);
    _Metoro.begin();
    //_player.begin();
 
@@ -88,7 +87,7 @@ _Clock.adjust(2024,01,17,8,54);
 
    buttonMenuMinus.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuPlus.setDebounceTime(_DEBOUNCE_TIME);
-  // buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
+   buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuConfigure.setDebounceTime(_DEBOUNCE_TIME);
 }
 
@@ -105,7 +104,7 @@ void sayReport()
       break;
    case 2:
       _Metoro.readAndShow();
-      _player.sayTheTemperature(_Metoro.data.temperature);     
+      _player.sayTheTemperature(_Metoro.data.temperature);
       break;
    case 3:
       _Inclinometro.readAndShowCarForm();
@@ -133,28 +132,60 @@ void buttonRutine(ezButton &button)
       releasedTime = millis();
       long pressDuration = releasedTime - pressedTime;
 
-      if (pressDuration < _SHORT_PRESS_TIME)
+      // SET CONFIG STATUS
+      if (pressDuration > _LONG_PRESS_TIME && &button == &buttonMenuConfigure)
       {
-          if (&button == &buttonMenuMinus && activeFunction>1)
+         if (activeConfig == false)
          {
-            activeFunction--;
+            activeConfig = true;
+            digitalWrite(_RED_LED, 1);
          }
-         else if (&button == &buttonMenuPlus && activeFunction < _NUMBER_THE_OPTIONS)
+         else
          {
-            activeFunction++;
+            activeConfig = false;
+            digitalWrite(_RED_LED, 0);
          }
-         /*else if (&button == &buttonMenuSpeech)
-         {
-            //sayReport();
-         }*/
       }
-      if (pressDuration > _LONG_PRESS_TIME)
+
+      // SHORT PRESS
+      if (activeConfig == false)
       {
-         if (&button == &buttonMenuConfigure && (activeFunction==3 || activeFunction==4))
+         if (pressDuration < _SHORT_PRESS_TIME)
+         {
+            if (&button == &buttonMenuMinus && activeFunction > 1)
+            {
+               activeFunction--;
+            }
+            else if (&button == &buttonMenuPlus && activeFunction < _NUMBER_THE_OPTIONS)
+            {
+               activeFunction++;
+            }
+            /*else if (&button == &buttonMenuSpeech)
+            {
+               //sayReport();
+            }*/
+         }
+      }
+      // INTO CONFIG
+      else
+      {
+         // Calibrate inclinometer
+         if (&button == &buttonMenuSpeech && (activeFunction == 3 || activeFunction == 4))
          {
             _Inclinometro.setZero();
-            digitalWrite(_RED_LED, 1);
-            //_Menu.show();
+         }
+         // Ajust clock
+         if (activeFunction == 1)
+         {
+            if (&button == &buttonMenuSpeech)
+            {
+            }
+            if (&button == &buttonMenuMinus)
+            {
+            }
+            if (&button == &buttonMenuPlus)
+            {
+            }
          }
       }
    }
@@ -167,7 +198,7 @@ void loop(void)
    /*=========================*/
    buttonRutine(buttonMenuMinus);
    buttonRutine(buttonMenuPlus);
-   //buttonRutine(buttonMenuSpeech);
+   buttonRutine(buttonMenuSpeech);
    buttonRutine(buttonMenuConfigure);
 
    /*===============================*/
