@@ -28,7 +28,6 @@ private:
   float _actualTemperature;
   float _previousTemperature;
   float _humedity = 0;
-
 public:
   enum dateType {
     _DAY,_MONTH,_YEAR,_HOUR,_MINUTES
@@ -42,6 +41,9 @@ public:
   void showClock(void);
   void add(dateType attribute,uint16_t inc);
   void adjust(int year,int month,int day,int hour,int minute);
+  void showAttributeConfig(bool view);
+  int statusConfig;
+  bool isConfig=false;
 };
 
 #endif

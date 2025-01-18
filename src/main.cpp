@@ -75,6 +75,8 @@ void setup(void)
    _Inclinometro.begin();
    _Clock.begin(&WireI2C_B);
    //_Clock.adjust(2024,01,17,10,51);
+   
+
    _Metoro.begin();
    //_player.begin();
 
@@ -182,6 +184,8 @@ void buttonRutine(ezButton &button)
             }
             if (&button == &buttonMenuMinus)
             {
+               
+               _Clock.add(_Clock._HOUR,-1);
             }
             if (&button == &buttonMenuPlus)
             {
