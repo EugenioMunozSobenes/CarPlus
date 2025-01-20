@@ -40,18 +40,18 @@ void CorDS3231::readAndShow(void)
 }
 void CorDS3231::showClock(void)
 {
-    //template:
+    // template:
     oled.u8g2.clearBuffer();
     oled.u8g2.setFontMode(1);                   // Transparent
     oled.u8g2.setFont(u8g2_font_logisoso24_tf); // alternative font:  oled.u8g2_font_10x20_mf
     oled.displayCenterText(oled.lcdData.xPos100/3-1, oled.lcdData.yPos50, ":");
     oled.displayCenterText(oled.lcdData.xPos100*2/3+1, oled.lcdData.yPos50, ":");
-    //hour,minutes,soconds:
-    oled.displayCenterText(oled.lcdData.xPos25-2, oled.lcdData.yPos50, String(data.hour()));
+    // hour,minutes,soconds:
+    oled.displayCenterText(oled.lcdData.xPos25-8, oled.lcdData.yPos50, String(data.hour()));
     oled.displayCenterText(oled.lcdData.xPos50, oled.lcdData.yPos50, String(data.minute()));
     oled.displayCenterText(oled.lcdData.xPos75+8, oled.lcdData.yPos50, String(data.second()));
 
-    //date:
+    // date:
     oled.u8g2.setFont(u8g2_font_6x13_mn);
     oled.displayCenterText(oled.lcdData.xPos50, oled.lcdData.yPos75, String(data.day()) + " / " + String(data.month()) + " / " + String(data.year()));
     if(_isConfig){
@@ -62,35 +62,36 @@ void CorDS3231::showClock(void)
 void CorDS3231::add(uint16_t inc)
 {
     DateTime dat;
+    uint16_t val;
     switch (_attrSelected)
     {
     case _HOUR:
-        uint16_t value =data.hour() + inc;
-        if(inc>0 && value==24){value=0;}
-        if(inc<0 && value==-1){value=24;}
-        dat = DateTime(data.year(), data.month(), data.day(), value, data.minute(), data.second());
+        val =data.hour() + inc;
+        if(inc>0 && val==24){val=0;}
+        if(inc<0 && val==-1){val=24;}
+        dat = DateTime(data.year(), data.month(), data.day(), val, data.minute(), data.second());
         break;
-    case _MINUTES /* Minute */:
-        uint16_t value = data.minute() + inc;
-        if(inc>0 && value==60){value=0;}
-        if(inc<0 && value==-1){value=59;}
-        dat = DateTime(data.year(), data.month(), data.day(), data.hour(), value, data.second());
+    case _MINUTE:
+        val = data.minute() + inc;
+        if(inc>0 && val==60){val=0;}
+        if(inc<0 && val==-1){val=59;}
+        dat = DateTime(data.year(), data.month(), data.day(), data.hour(), val, data.second());
         break;
-    case _DAY /* day */:
-        uint16_t value=data.day() + inc;
-        if(inc>0 && value==32){value=1;}
-        if(inc<0 && value==0){value=0;}
-        dat = DateTime(data.year(), data.month(), value, data.hour(), data.minute(), data.second());
+    case _DAY :
+        val=data.day() + inc;
+        if(inc>0 && val==32){val=1;}
+        if(inc<0 && val==0){val=0;}
+        dat = DateTime(data.year(), data.month(), val, data.hour(), data.minute(), data.second());
         break;
-    case _MONTH /* month */:
-        uint16_t value= data.month() + inc;
-        if(inc>0 && value==13){value=1;}
-        if(inc<0 && value==0){value=12;}        
-        dat = DateTime(data.year(),value, data.day(), data.hour(), data.minute(), data.second());
+    case _MONTH :
+        val= data.month() + inc;
+        if(inc>0 && val==13){val=1;}
+        if(inc<0 && val==0){val=12;}        
+        dat = DateTime(data.year(),val, data.day(), data.hour(), data.minute(), data.second());
         break;
-    case _YEAR /* year */:
-        uint16_t value=data.year() + inc;
-        dat = DateTime(value, data.month(), data.day(), data.hour(), data.minute(), data.second());
+    case _YEAR :
+        val=data.year() + inc;
+        dat = DateTime(val, data.month(), data.day(), data.hour(), data.minute(), data.second());
         break;
     default:
         dat = data;
@@ -114,24 +115,29 @@ void CorDS3231::showAttributeConfig()
         w = oled.lcdData.xPos100*1/3-4;
         h = oled.lcdData.yPos50 + 2;
         break;
-    case _MINUTES:
+    case _MINUTE:
         x = oled.lcdData.xPos100*1/3+2;
         y = 2;
         w = oled.lcdData.xPos100*1/3-3;
         h = oled.lcdData.yPos50 + 2;
         break;
     case _DAY:
-        x = oled.lcdData.xPos25 - 35;
-        y = oled.lcdData.yPos75 + 4;
-        w = 40;
-        h = 2;
+        x = oled.lcdData.xPos25 - 12;
+        y = oled.lcdData.yPos50 + 2;
+        w = 10*2;
+        h = 18;
         break;
     case _MONTH:
-        /* code */
+        x = oled.lcdData.xPos50 - 14;
+        y = oled.lcdData.yPos50 +2;
+        w = 10*2-4;
+        h = 18;
         break;
     case _YEAR:
-        x = oled.lcdData.xPos75 - 40;
-        y = oled.lcdData.yPos75 + 4;
+        x = oled.lcdData.xPos50 + 12;
+        y = oled.lcdData.yPos50 + 2;
+        w = 10*4-4;
+        h = 18;
         break;
     default:
         x = 0;
@@ -147,9 +153,9 @@ void CorDS3231::selectNextAttribute()
     switch (_attrSelected)
     {
     case _HOUR:
-       _attrSelected=_MINUTES;
+       _attrSelected=_MINUTE;
         break;
-     case _MINUTES:
+     case _MINUTE:
         _attrSelected=_DAY;
         break;
      case _DAY:

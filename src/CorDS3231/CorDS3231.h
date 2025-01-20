@@ -30,7 +30,7 @@ private:
   float _humedity = 0;
 public:
   enum dateType {
-    _DAY,_MONTH,_YEAR,_HOUR,_MINUTES
+    _DAY,_MONTH,_YEAR,_HOUR,_MINUTE
   } ;
   CorU8G2 oled;
   CorDS3231(CorU8G2 *pantalla);

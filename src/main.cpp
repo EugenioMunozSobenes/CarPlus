@@ -74,11 +74,8 @@ void setup(void)
    /*===========================*/
    _Inclinometro.begin();
    _Clock.begin(&WireI2C_B);
-   //_Clock.adjust(2024,01,17,10,51);
-   
-
    _Metoro.begin();
-   //_player.begin();
+   _player.begin();
 
    pinMode(_RED_LED, OUTPUT);
    digitalWrite(_RED_LED, 0);
@@ -139,11 +136,13 @@ void buttonRutine(ezButton &button)
       {
          if (activeConfig == false)
          {
+            _Clock._isConfig=true;
             activeConfig = true;
             digitalWrite(_RED_LED, 1);
          }
          else
          {
+            _Clock._isConfig=false;
             activeConfig = false;
             digitalWrite(_RED_LED, 0);
          }
@@ -162,10 +161,10 @@ void buttonRutine(ezButton &button)
             {
                activeFunction++;
             }
-            /*else if (&button == &buttonMenuSpeech)
+            else if (&button == &buttonMenuSpeech)
             {
-               //sayReport();
-            }*/
+               sayReport();
+            }
          }
       }
       // BOTON CORTO EN MODO CONFIGURACION
@@ -224,9 +223,6 @@ void loop(void)
          break;
       case 4:
          _Inclinometro.readAndShowFlightForm();
-         break;
-      case 5:
-         //_Menu.show();
          break;
       }
 
