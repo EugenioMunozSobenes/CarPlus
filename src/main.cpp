@@ -149,7 +149,7 @@ void buttonRutine(ezButton &button)
          }
       }
 
-      // SHORT PRESS
+      // BOTON CORTO EN MODO NORMAL
       if (activeConfig == false)
       {
          if (pressDuration < _SHORT_PRESS_TIME)
@@ -168,7 +168,7 @@ void buttonRutine(ezButton &button)
             }*/
          }
       }
-      // INTO CONFIG
+      // BOTON CORTO EN MODO CONFIGURACION
       else
       {
          // Calibrate inclinometer
@@ -181,14 +181,15 @@ void buttonRutine(ezButton &button)
          {
             if (&button == &buttonMenuSpeech)
             {
+               _Clock.selectNextAttribute();
             }
             if (&button == &buttonMenuMinus)
-            {
-               
-               _Clock.add(_Clock._HOUR,-1);
+            {               
+               _Clock.add(-1);
             }
             if (&button == &buttonMenuPlus)
             {
+               _Clock.add(1);
             }
          }
       }

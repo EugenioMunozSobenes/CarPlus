@@ -36,14 +36,17 @@ public:
   CorDS3231(CorU8G2 *pantalla);
   DateTime data;
   bool begin(TwoWire *wireInstance);
+  //display
   void welcome(void);
   void readAndShow(void);
   void showClock(void);
-  void add(dateType attribute,uint16_t inc);
+  //config
+  void add(uint16_t inc);
   void adjust(int year,int month,int day,int hour,int minute);
-  void showAttributeConfig(bool view);
-  int statusConfig;
-  bool isConfig=false;
+  void showAttributeConfig();
+  void selectNextAttribute();
+  int _attrSelected;
+  bool _isConfig=false;
 };
 
 #endif

@@ -15,7 +15,7 @@
 
 CorDS3231::CorDS3231(CorU8G2 *pantalla) : oled(*pantalla)
 {
-    statusConfig = _HOUR;
+    _attrSelected = _HOUR;
 }
 bool CorDS3231::begin(TwoWire *wireInstance)
 {
@@ -54,33 +54,43 @@ void CorDS3231::showClock(void)
     //date:
     oled.u8g2.setFont(u8g2_font_6x13_mn);
     oled.displayCenterText(oled.lcdData.xPos50, oled.lcdData.yPos75, String(data.day()) + " / " + String(data.month()) + " / " + String(data.year()));
-    showAttributeConfig(true);
-    
-    //showAttributeConfig(true);
-    // statusConfig=_DAY; showAttributeConfig(true);
-    // statusConfig=_MONTH; showAttributeConfig(true);
-    // statusConfig=_YEAR; showAttributeConfig(true);
+    if(_isConfig){
+        showAttributeConfig();
+    }
     oled.u8g2.sendBuffer();
 }
-void CorDS3231::add(dateType attribute, uint16_t inc)
+void CorDS3231::add(uint16_t inc)
 {
     DateTime dat;
-    switch (attribute)
+    switch (_attrSelected)
     {
     case _HOUR:
-        dat = DateTime(data.year(), data.month(), data.day(), data.hour() + inc, data.minute(), data.second());
+        uint16_t value =data.hour() + inc;
+        if(inc>0 && value==24){value=0;}
+        if(inc<0 && value==-1){value=24;}
+        dat = DateTime(data.year(), data.month(), data.day(), value, data.minute(), data.second());
         break;
     case _MINUTES /* Minute */:
-        dat = DateTime(data.year(), data.month(), data.day(), data.hour() + inc, data.minute(), data.second());
+        uint16_t value = data.minute() + inc;
+        if(inc>0 && value==60){value=0;}
+        if(inc<0 && value==-1){value=59;}
+        dat = DateTime(data.year(), data.month(), data.day(), data.hour(), value, data.second());
         break;
     case _DAY /* day */:
-        dat = DateTime(data.year(), data.month(), data.day() + inc, data.hour(), data.minute(), data.second());
+        uint16_t value=data.day() + inc;
+        if(inc>0 && value==32){value=1;}
+        if(inc<0 && value==0){value=0;}
+        dat = DateTime(data.year(), data.month(), value, data.hour(), data.minute(), data.second());
         break;
     case _MONTH /* month */:
-        dat = DateTime(data.year(), data.month() + inc, data.day(), data.hour(), data.minute(), data.second());
+        uint16_t value= data.month() + inc;
+        if(inc>0 && value==13){value=1;}
+        if(inc<0 && value==0){value=12;}        
+        dat = DateTime(data.year(),value, data.day(), data.hour(), data.minute(), data.second());
         break;
     case _YEAR /* year */:
-        dat = DateTime(data.year() + inc, data.month(), data.day(), data.hour(), data.minute(), data.second());
+        uint16_t value=data.year() + inc;
+        dat = DateTime(value, data.month(), data.day(), data.hour(), data.minute(), data.second());
         break;
     default:
         dat = data;
@@ -93,10 +103,10 @@ void CorDS3231::adjust(int year, int month, int day, int hour, int minute)
 {
     rtc.adjust(DateTime(year, month, day, hour, minute, 0));
 }
-void CorDS3231::showAttributeConfig(bool view)
+void CorDS3231::showAttributeConfig()
 {
     int x, y, w, h;
-    switch (statusConfig)
+    switch (_attrSelected)
     {
     case _HOUR:
        x = 1;
@@ -130,6 +140,26 @@ void CorDS3231::showAttributeConfig(bool view)
         h = 2;
         break;
     }
-
     oled.u8g2.drawFrame(x, y, w, h);
+}
+void CorDS3231::selectNextAttribute()
+{
+    switch (_attrSelected)
+    {
+    case _HOUR:
+       _attrSelected=_MINUTES;
+        break;
+     case _MINUTES:
+        _attrSelected=_DAY;
+        break;
+     case _DAY:
+        _attrSelected=_MONTH;
+        break;
+    case _MONTH:
+        _attrSelected=_YEAR;
+        break;
+    case _YEAR:
+        _attrSelected=_HOUR;
+        break;
+    }
 }
