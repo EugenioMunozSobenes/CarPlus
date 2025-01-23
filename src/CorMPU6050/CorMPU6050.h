@@ -29,7 +29,7 @@ typedef struct
   float dt;
   float ang_x, ang_y;
   float ang_x_prev, ang_y_prev;
-  float offset_x=0,offset_y=0;
+  float offset_x = 0, offset_y = 0;
 } mpu6050_t;
 
 // ================
@@ -51,12 +51,16 @@ public:
   void setZero();
   bool checkAlertPitch();
   bool checkAlertRoll();
+  int _attrSelected = 0;
+  bool _isConfig = false;
+  void addAlertLimit(int16_t value);
+  void selectNextAttribute();
+
 private:
   Adafruit_MPU6050 mpu;
   int alertPitch = 35; // Default value
   int alertRoll = 30;  // Default value
   void read(void);
- 
 };
 
 #endif

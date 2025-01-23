@@ -32,7 +32,8 @@ void CorMPU6050::welcome()
 void CorMPU6050::read()
 {
   sensors_event_t a, g, temp;
-  mpuData.dt = (millis() - mpuData.tiempo_prev) / 1000.0;
+  //mpuData.dt = (millis() - mpuData.tiempo_prev) / 1000.0;
+  mpuData.dt = (millis() - mpuData.tiempo_prev) / 500.0;
   mpuData.tiempo_prev = millis();
   mpu.getEvent(&a, &g, &temp);
   float ax = a.acceleration.x;
@@ -143,4 +144,25 @@ bool CorMPU6050::checkAlertPitch()
 bool CorMPU6050::checkAlertRoll()
 {
   return alertRoll < abs(mpuData.ang_x);
+}
+void CorMPU6050::selectNextAttribute(){
+  _attrSelected++;
+  if(_attrSelected == 2) _attrSelected =0;
+}
+void CorMPU6050::addAlertLimit(int16_t value)
+{
+  if (_attrSelected == 0)
+  {
+    if (value > 0 && alertRoll < 45)
+      alertRoll += value;
+    else if (value < 0 && alertRoll > 5)
+      alertRoll += value;
+  }
+  else
+  {
+    if (value > 0 && alertRoll < 45)
+      alertPitch += value;
+    else if (value < 0 && alertRoll > 5)
+      alertPitch += value;
+  }
 }

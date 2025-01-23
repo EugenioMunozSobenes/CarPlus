@@ -17,7 +17,6 @@
 #include "CorDS3231/CorDS3231.h"
 #include "CorMeteorology/CorMeteorology.h"
 #include "CorDYPLAYER/CorDYPLAYER.h"
-#include "CorMenu/CorMenu.h"
 #define _SDA 15    /* D15 */
 #define _SCL 4     /* D4 */
 #define _RED_LED 2 /* D2 */
@@ -52,7 +51,7 @@ CorMPU6050 _Inclinometer(&_Pantalla);
 CorDS3231 _Clock(&_Pantalla);
 CorMeteorology _Metoro(&_Pantalla);
 CorDYPLAYER _player;
-CorMenu _Menu(&u8g2);
+
 unsigned long _SENSOR_SCAN_DELAY = 200;
 unsigned long _LAST_TIME_MILLIS = 0;
 unsigned long _LAST_TIME_MILLIS_ALERT = 0;
@@ -87,6 +86,8 @@ void setup(void)
    buttonMenuPlus.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuConfigure.setDebounceTime(_DEBOUNCE_TIME);
+
+   _player.sayWelcome();
 }
 
 /*=====================*/
@@ -170,9 +171,20 @@ void buttonRutine(ezButton &button)
       else
       {
          // Calibrate inclinometer
-         if (&button == &buttonMenuSpeech && (activeFunction == 3 || activeFunction == 4))
+         if (activeFunction == 3 || activeFunction == 4)
          {
-            _Inclinometer.setZero();
+            if (&button == &buttonMenuSpeech)
+            {
+               _Inclinometer.selectNextAttribute();
+            }
+            if (&button == &buttonMenuMinus)
+            {
+               _Inclinometer.addAlertLimit(-1);
+            }
+            if (&button == &buttonMenuPlus)
+            {
+               _Inclinometer.addAlertLimit(1);
+            }
          }
          // Ajust clock
          if (activeFunction == 1)
@@ -213,7 +225,7 @@ void readSensors()
 }
 void checkAlertStatus()
 {
-   if ((millis() - _LAST_TIME_MILLIS_ALERT) > _SENSOR_SCAN_DELAY*30) /*Sensor reading interval, non blocking delay*/
+   if ((millis() - _LAST_TIME_MILLIS_ALERT) > _SENSOR_SCAN_DELAY * 30) /*Sensor reading interval, non blocking delay*/
    {
       // inclinometer
       if (_Inclinometer.checkAlertPitch())
