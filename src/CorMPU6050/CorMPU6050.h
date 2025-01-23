@@ -49,11 +49,14 @@ public:
   void readAndShowFlightForm(void);
   void setAlerts(int alertRoll, int alertPitch);
   void setZero();
+  bool checkAlertPitch();
+  bool checkAlertRoll();
 private:
   Adafruit_MPU6050 mpu;
   int alertPitch = 35; // Default value
-  int alertRoll = 45;  // Default value
+  int alertRoll = 30;  // Default value
   void read(void);
+ 
 };
 
 #endif

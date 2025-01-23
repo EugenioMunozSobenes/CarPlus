@@ -36,9 +36,8 @@ bool activeConfig = false;
 unsigned long pressedTime = 0;
 unsigned long releasedTime = 0;
 
-ezButton buttonMenuMinus(13); /* D13 1000*/
-ezButton buttonMenuPlus(32);  /* D32 0001*/
-
+ezButton buttonMenuMinus(13);     /* D13 1000*/
+ezButton buttonMenuPlus(32);      /* D32 0001*/
 ezButton buttonMenuSpeech(33);    /* D33 0010*/
 ezButton buttonMenuConfigure(12); /* D12 0100*/
 
@@ -49,20 +48,20 @@ ezButton buttonMenuConfigure(12); /* D12 0100*/
 U8G2_ST7565_NHD_C12864_F_4W_SW_SPI u8g2(U8G2_R0, /* scl=D18*/ 18, /* si=D23*/ 23, /* cs=D5*/ 5, /* rs=D21*/ 21, /* rse=D19*/ 19);
 
 CorU8G2 _Pantalla(&u8g2);
-CorMPU6050 _Inclinometro(&_Pantalla);
+CorMPU6050 _Inclinometer(&_Pantalla);
 CorDS3231 _Clock(&_Pantalla);
 CorMeteorology _Metoro(&_Pantalla);
 CorDYPLAYER _player;
 CorMenu _Menu(&u8g2);
-unsigned long _SENSOR_SCAN_DELAY = 300;
+unsigned long _SENSOR_SCAN_DELAY = 200;
 unsigned long _LAST_TIME_MILLIS = 0;
+unsigned long _LAST_TIME_MILLIS_ALERT = 0;
 TwoWire WireI2C_B = TwoWire(1);
 /*================*/
 /*    setup       */
 /*================*/
 void setup(void)
 {
-
    // Add menu page to menu and set it as current
 
    Serial.begin(115200);
@@ -72,7 +71,7 @@ void setup(void)
    /*===========================*/
    /* initiates sensor services */
    /*===========================*/
-   _Inclinometro.begin();
+   _Inclinometer.begin();
    _Clock.begin(&WireI2C_B);
    _Metoro.begin();
    _player.begin();
@@ -106,14 +105,14 @@ void sayReport()
       _player.sayTheTemperature(_Metoro.data.temperature);
       break;
    case 3:
-      _Inclinometro.readAndShowCarForm();
-      _player.sayTheRollInclination(_Inclinometro.mpuData.ang_x);
-      _player.sayThePitchInclination(_Inclinometro.mpuData.ang_y);
+      _Inclinometer.readAndShowCarForm();
+      _player.sayTheRollInclination(_Inclinometer.mpuData.ang_x);
+      _player.sayThePitchInclination(_Inclinometer.mpuData.ang_y);
       break;
    case 4:
-      _Inclinometro.readAndShowFlightForm();
-      _player.sayTheRollInclination(_Inclinometro.mpuData.ang_x);
-      _player.sayThePitchInclination(_Inclinometro.mpuData.ang_y);
+      _Inclinometer.readAndShowFlightForm();
+      _player.sayTheRollInclination(_Inclinometer.mpuData.ang_x);
+      _player.sayThePitchInclination(_Inclinometer.mpuData.ang_y);
    }
    // Serial.println(activeFunction);
 }
@@ -136,13 +135,13 @@ void buttonRutine(ezButton &button)
       {
          if (activeConfig == false)
          {
-            _Clock._isConfig=true;
+            _Clock._isConfig = true;
             activeConfig = true;
             digitalWrite(_RED_LED, 1);
          }
          else
          {
-            _Clock._isConfig=false;
+            _Clock._isConfig = false;
             activeConfig = false;
             digitalWrite(_RED_LED, 0);
          }
@@ -173,7 +172,7 @@ void buttonRutine(ezButton &button)
          // Calibrate inclinometer
          if (&button == &buttonMenuSpeech && (activeFunction == 3 || activeFunction == 4))
          {
-            _Inclinometro.setZero();
+            _Inclinometer.setZero();
          }
          // Ajust clock
          if (activeFunction == 1)
@@ -183,7 +182,7 @@ void buttonRutine(ezButton &button)
                _Clock.selectNextAttribute();
             }
             if (&button == &buttonMenuMinus)
-            {               
+            {
                _Clock.add(-1);
             }
             if (&button == &buttonMenuPlus)
@@ -194,6 +193,43 @@ void buttonRutine(ezButton &button)
       }
    }
 }
+void readSensors()
+{
+   switch (activeFunction)
+   {
+   case 1:
+      _Clock.readAndShow();
+      break;
+   case 2:
+      _Metoro.readAndShow();
+      break;
+   case 3:
+      _Inclinometer.readAndShowCarForm();
+      break;
+   case 4:
+      _Inclinometer.readAndShowFlightForm();
+      break;
+   }
+}
+void checkAlertStatus()
+{
+   if ((millis() - _LAST_TIME_MILLIS_ALERT) > _SENSOR_SCAN_DELAY*30) /*Sensor reading interval, non blocking delay*/
+   {
+      // inclinometer
+      if (_Inclinometer.checkAlertPitch())
+      {
+         _player.sayThePitchInclination(_Inclinometer.mpuData.ang_y);
+      }
+      if (_Inclinometer.checkAlertRoll())
+      {
+         _player.sayTheRollInclination(_Inclinometer.mpuData.ang_x);
+      }
+
+      // temperature
+      _LAST_TIME_MILLIS_ALERT = millis();
+   }
+}
+
 void loop(void)
 {
 
@@ -208,24 +244,11 @@ void loop(void)
    /*===============================*/
    /* display on screen information */
    /*===============================*/
+   long pressDuration = releasedTime;
    if ((millis() - _LAST_TIME_MILLIS) > _SENSOR_SCAN_DELAY) /*Sensor reading interval, non blocking delay*/
    {
-      switch (activeFunction)
-      {
-      case 1:
-         _Clock.readAndShow();
-         break;
-      case 2:
-         _Metoro.readAndShow();
-         break;
-      case 3:
-         _Inclinometro.readAndShowCarForm();
-         break;
-      case 4:
-         _Inclinometro.readAndShowFlightForm();
-         break;
-      }
-
+      readSensors();
+      checkAlertStatus();
       _LAST_TIME_MILLIS = millis();
    }
 }

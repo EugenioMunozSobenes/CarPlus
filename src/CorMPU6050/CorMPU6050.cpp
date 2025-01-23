@@ -80,8 +80,8 @@ void CorMPU6050::showFlightForm(void)
   oled.u8g2.drawLine(X1, Y1, X2, Y2);
   oled.u8g2.drawLine(X1, Y1 + 1, X2, Y2 + 1);
   oled.u8g2.setFont(u8g2_font_10x20_me);
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos50 - 6, String(mpuData.ang_y +mpuData.offset_y,0).c_str());
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos100 - 6, String(-mpuData.ang_x+mpuData.offset_x, 0).c_str());
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos50 - 6, String(mpuData.ang_y + mpuData.offset_y, 0).c_str());
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos100 - 6, String(-mpuData.ang_x + mpuData.offset_x, 0).c_str());
   oled.u8g2.sendBuffer();
 }
 void CorMPU6050::showCarForm(void)
@@ -105,8 +105,8 @@ void CorMPU6050::showCarForm(void)
 
   // Show data
   oled.u8g2.setFont(u8g2_font_logisoso24_tf);
-  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos75, String(abs(mpuData.ang_x)+mpuData.offset_x, 0)); // Roll
-  oled.displayCenterText(oled.lcdData.xPos75, oled.lcdData.yPos75, String(abs(mpuData.ang_y)+mpuData.offset_y, 0)); // Pitch
+  oled.displayCenterText(oled.lcdData.xPos25, oled.lcdData.yPos75, String(abs(mpuData.ang_x) + mpuData.offset_x, 0)); // Roll
+  oled.displayCenterText(oled.lcdData.xPos75, oled.lcdData.yPos75, String(abs(mpuData.ang_y) + mpuData.offset_y, 0)); // Pitch
 
   float x = 30 * cos(M_PI / 2 + mpuData.ang_x * M_PI / 180.0);
   float y = -30 * sin(M_PI / 2 + mpuData.ang_x * M_PI / 180.0);
@@ -133,7 +133,14 @@ void CorMPU6050::setAlerts(int roll, int pitch)
 }
 void CorMPU6050::setZero()
 {
-  mpuData.offset_y=-mpuData.ang_y;
-  mpuData.offset_x=mpuData.ang_x;
-    
+  mpuData.offset_y = -mpuData.ang_y;
+  mpuData.offset_x = mpuData.ang_x;
+}
+bool CorMPU6050::checkAlertPitch()
+{
+  return alertPitch < abs(mpuData.ang_y);
+}
+bool CorMPU6050::checkAlertRoll()
+{
+  return alertRoll < abs(mpuData.ang_x);
 }
