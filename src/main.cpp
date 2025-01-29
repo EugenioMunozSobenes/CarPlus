@@ -56,6 +56,22 @@ unsigned long _SENSOR_SCAN_DELAY = 200;
 unsigned long _LAST_TIME_MILLIS = 0;
 unsigned long _LAST_TIME_MILLIS_ALERT = 0;
 TwoWire WireI2C_B = TwoWire(1);
+
+void startMessage()
+{
+
+   _Pantalla.u8g2.setFontMode(1); // Transparent
+   _Pantalla.u8g2.setFont(u8g2_font_10x20_mr);
+   _Pantalla.displayCenterText(_Pantalla.lcdData.xPos50, _Pantalla.lcdData.yPos50, "Welcome");
+
+   _Pantalla.u8g2.setFont(u8g2_font_6x10_tf);
+   _Pantalla.displayCenterText(_Pantalla.lcdData.xPos50, _Pantalla.lcdData.yPos75, "Carinfo v2.2");
+
+   _Pantalla.u8g2.sendBuffer();
+   _player.sayWelcome();
+   delay(4000);
+}
+
 /*================*/
 /*    setup       */
 /*================*/
@@ -87,7 +103,7 @@ void setup(void)
    buttonMenuSpeech.setDebounceTime(_DEBOUNCE_TIME);
    buttonMenuConfigure.setDebounceTime(_DEBOUNCE_TIME);
 
-   _player.sayWelcome();
+   startMessage();
 }
 
 /*=====================*/

@@ -26,6 +26,9 @@ void CorDYPLAYER::begin(void)
 }
 void CorDYPLAYER::sayWelcome(void)
 {
+    int i = 0;
+    voicesBuffer[i++] = 79; // WELCOME;
+    sendToDYPLAYER(i);
 }
 void CorDYPLAYER::sayTheRollInclination(float angle)
 {
